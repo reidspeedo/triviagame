@@ -54,7 +54,44 @@ io.on('connection', socket => {
 
     });
 
+    socket.on("sendMessage", (message, callback) => {
+        const {error, player} = getPlayer(socket.id);
+
+        if (error) return callback(error.message);
+
+        if (player) {
+            io.to(player.room).emit(
+                "message",
+                formatMessage(player.playerName, message)
+                );
+                callback();
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log("A player disconnected.");
+      
+        const disconnectedPlayer = removePlayer(socket.id);
+      
+        if (disconnectedPlayer) {
+          const { playerName, room } = disconnectedPlayer;
+          io.in(room).emit(
+            "message",
+            formatMessage("Admin", `${playerName} has left!`)
+          );
+      
+          io.in(room).emit("room", {
+            room,
+            players: getAllPlayers(room),
+          });
+        }
+      });
+
+    
+
 });
+
+
 
 server.listen(port, () => {
     console.log(`Server is up on port ${port}.`);
