@@ -1,4 +1,6 @@
 const socket = io();
+
+// This section retrieves player name from URL and inserts it into the main header
 const urlSearchParams = new URLSearchParams(window.location.search);
 
 const playerName = urlSearchParams.get("playerName");
@@ -83,3 +85,11 @@ chatForm.addEventListener("submit", (event) => {
       if (error) return alert(error);
     });
   });
+
+const triviaQuestionButton = document.querySelector(".trivia__question-btn");
+triviaQuestionButton.addEventListener("click", () => {
+
+    socket.emit("getQuestion", null, (error) =>{
+        if (error) return alert(error);
+    });
+});
