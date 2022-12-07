@@ -3,7 +3,13 @@ const http = require('http');
 const path = require('path');
 const socketio = require('socket.io');
 
+// importing utilities
 const formatMessage = require("./utils/formatMessage.js");
+const {
+    game,
+    getQuestion,
+    updateGame,
+} = require("./utils/game.js")
 
 const {
     addPlayer,
@@ -13,11 +19,13 @@ const {
 } = require("./utils/players.js");
 
 
+// initiating server
 const port = process.env.PORT || 8080;
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+// providing path for front end code that server will use
 const publicDirectoryPath = path.join(__dirname, '../public');
 app.use(express.static(publicDirectoryPath));
 
@@ -25,8 +33,8 @@ app.use(express.static(publicDirectoryPath));
 io.on('connection', socket => {
 
     // receiving 'join' emit from trivia.js
-    socket.on('join', ({ playerName, room }, callback) => {
-        const {error, newPlayer} = addPlayer({id: socket.id, playerName, room});
+    socket.on('join', ({ playerName, room, team }, callback) => {
+        const {error, newPlayer} = addPlayer({id: socket.id, playerName, room, team});
         
         console.log(`${newPlayer.playerName} just connected to room: ${newPlayer.room}.`);
         
@@ -37,13 +45,13 @@ io.on('connection', socket => {
         socket.join(newPlayer.room);
 
         // sending welcome message back to JUST the newPlayer
-        socket.emit('message', formatMessage('Admin', 'Welcome!'));
+        socket.emit('message', formatMessage('Admin', `Welcome ya filthy ${team}`));
 
         // notifying other players that the newPlayer joined
         socket.broadcast
         .to(newPlayer.room)
         .emit('message',
-        formatMessage('Admin', `${newPlayer.playerName} has joined the game!`)
+        formatMessage('Admin', `${newPlayer.playerName} has joined the game as a ${team}!`)
         );
 
             // Emit a "room" event to all players to update their Game Info sections
@@ -87,7 +95,35 @@ io.on('connection', socket => {
         }
       });
 
-    
+    socket.on('startRound', (room) => {
+        getQuestion((error, value) => {
+        if (error) return alert(error);
+        
+        // Update game details
+        const qdata = value[0];
+        updateGame('prompt.question',qdata.question); //update question
+        updateGame('prompt.category',qdata.category); //update category
+        updateGame('prompt.createdAt',new Date().getTime()); //update createdTime
+        updateGame('prompt.answers',qdata.incorrectAnswers.concat([qdata.correctAnswer])); //update answers
+        updateGame('prompt.correctAnswer',qdata.correctAnswer); //update correctAnswer
+
+        // Send game details to all players
+        io.in(room).emit('gameDetails', { game });
+        
+    });
+        
+        // call getQuestion
+            // request Trivia API
+            // return gameinformation
+            // update game - prompt information information
+            // emit message with game details 
+    })
+
+    //socket.on("any submission") - Update game object - emit back "updategame details"
+
+    //socket.on("next question") - updategame object - getQuestion - emit back updategame details
+
+    //socket.on("gameOver") -> update game details to show winner
 
 });
 

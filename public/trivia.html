@@ -12,7 +12,7 @@
 
       <section class="section trivia">
         <h2 class="subheading">trivia</h2>
-        <button class="btn trivia__question-btn">Get Question</button>
+        <button class="btn trivia__startround-btn">Start Round</button>
         <button class="btn trivia__answer-btn" disabled>
           Reveal Answer
         </button>
@@ -53,22 +53,32 @@
 
     <script id="main-heading-template" type="text/x-handlebars-template">
       <h1 class='heading'>
-        Are you smarter than a BLANK, {{playerName}}?
+        Are you smarter than a {{opp_team}}, {{playerName}}?
       </h1>
     </script>
 
     <script id="game-info-template" type="text/x-handlebars-template">
       <h2 class='subheading'>
-        game info
+        game info {{question}}
       </h2>
       <h3>
         Room: {{room}}
       </h3>
       <h3>
-        Players:
+      the woke folk:
       </h3>
       <ul>
-        {{#each players}}
+        {{#each lib_players}}
+          <li>
+            {{playerName}}
+          </li>
+        {{/each}}
+      </ul>
+      <h3>
+      the radical right:
+      </h3>
+      <ul>
+        {{#each con_players}}
           <li>
             {{playerName}}
           </li>

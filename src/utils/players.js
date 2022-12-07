@@ -1,10 +1,10 @@
 const players = [];
 
 // Add a new player to the game
-const addPlayer = ({ id, playerName, room }) => {
-  if (!playerName || !room) {
+const addPlayer = ({ id, playerName, room, team }) => {
+  if (!playerName || !room || !team) {
     return {
-      error: new Error("Please enter a player name and room!"),
+      error: new Error("Please enter a player name, room, and team!"),
     };
   }
 
@@ -13,7 +13,7 @@ const addPlayer = ({ id, playerName, room }) => {
   room = room.trim().toLowerCase();
 
   const existingPlayer = players.find((player) => {
-    return player.room === room && player.playerName === playerName;
+    return player.room === room && player.playerName === playerName && player.team === team;
   });
 
   if (existingPlayer) {
@@ -22,9 +22,8 @@ const addPlayer = ({ id, playerName, room }) => {
     };
   }
 
-  const newPlayer = { id, playerName, room };
+  const newPlayer = { id, playerName, room , team };
   players.push(newPlayer);
-
   return { newPlayer };
 };
 
@@ -56,10 +55,18 @@ const removePlayer = (id) => {
   });
 };
 
+const getTeam = (team) => {
+  if (team === "liberal") {
+    return "conservative"
+  }
+  else return "liberal"
+}
+
 // Export our helper methods
 module.exports = {
   addPlayer,
   getPlayer,
   getAllPlayers,
   removePlayer,
+  getTeam,
 };

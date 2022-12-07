@@ -3,8 +3,12 @@ const socket = io();
 // This section retrieves player name from URL and inserts it into the main header
 const urlSearchParams = new URLSearchParams(window.location.search);
 
+
 const playerName = urlSearchParams.get("playerName");
 const room = urlSearchParams.get("room");
+const team = urlSearchParams.get("team");
+const teams = ['liberal', 'conservative'];
+const opp_team = teams.filter(input => input != team)[0];
 
 const mainHeadingTemplate = document.querySelector(
   "#main-heading-template"
@@ -16,10 +20,11 @@ document.querySelector("main").insertAdjacentHTML(
   "afterBegin",
   welcomeHeadingHTML({
     playerName,
+    opp_team,
   })
 );
 
-socket.emit('join', { playerName, room }, error => {
+socket.emit('join', { playerName, room, team }, error => {
     if (error) {
         alert(error);
         location.href = '/';
@@ -56,9 +61,13 @@ socket.on("room", ({ room, players }) => {
     // Compile the template into HTML by calling Handlebars.compile(), which returns a function
     const template = Handlebars.compile(sidebarTemplate);
   
+    const lib_players = players.filter(player => player.team === 'liberal');
+    const con_players = players.filter(player => player.team === 'conservative');
+
     const html = template({
       room,
-      players,
+      lib_players,
+      con_players,
     });
   
     // set gameInfo container's html content to the new html
@@ -86,10 +95,38 @@ chatForm.addEventListener("submit", (event) => {
     });
   });
 
-const triviaQuestionButton = document.querySelector(".trivia__question-btn");
-triviaQuestionButton.addEventListener("click", () => {
+const triviaStartRoundButton = document.querySelector(".trivia__startround-btn");
+triviaStartRoundButton.addEventListener("click", () => {
 
-    socket.emit("getQuestion", null, (error) =>{
+    socket.emit("startRound", room, (error) => {
         if (error) return alert(error);
+
+        // disable startRound button
     });
 });
+
+socket.on('gameDetails', ({game}) => {
+
+  const playerName = game.prompt.question;
+  const mainHeadingTemplate = document.querySelector(
+    "#main-heading-template"
+  ).innerHTML;
+  
+  const welcomeHeadingHTML = Handlebars.compile(mainHeadingTemplate);
+  
+  document.querySelector("main").insertAdjacentHTML(
+    "afterBegin",
+    welcomeHeadingHTML({
+      playerName,
+    })
+  );
+});
+
+
+//socket.on("updategame details")
+
+//socket.emit("anytime submissions are made - send back a message to update game object")
+
+//eventListener when max submissions = numberofplayers -> socket.emit("getnextquetion")
+
+//eventListener when currentRound = maxRounds emit gameover! (Smart contract pays out)

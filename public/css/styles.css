@@ -83,7 +83,7 @@
     padding: 20px;
   }
   
-  .registration-form input {
+  .registration-form input, select {
     font-family: 'Courier New', Courier, monospace;
     padding: 10px;
   }
