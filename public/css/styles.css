@@ -122,7 +122,7 @@
     flex: 1;
   }
   
-  .trivia__question-playername {
+  .trivia__question-category {
     display: inline-block;
     font-weight: 900;
     margin: 10px 0;

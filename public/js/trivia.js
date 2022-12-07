@@ -97,29 +97,35 @@ chatForm.addEventListener("submit", (event) => {
 
 const triviaStartRoundButton = document.querySelector(".trivia__startround-btn");
 triviaStartRoundButton.addEventListener("click", () => {
+    triviaStartRoundButton.setAttribute("disabled", "disabled");
 
     socket.emit("startRound", room, (error) => {
         if (error) return alert(error);
 
-        // disable startRound button
     });
 });
 
 socket.on('gameDetails', ({game}) => {
+  
+  const triviaInfo = document.querySelector(".trivia__question");
 
-  const playerName = game.prompt.question;
-  const mainHeadingTemplate = document.querySelector(
-    "#main-heading-template"
-  ).innerHTML;
+  const triviaQuestions = document.querySelector("#trivia-question-template").innerHTML;
+  // const triviaAnswers = document.querySelector(".trivia__answers");
+
+  const { question, category, answers } = game.prompt;
+
   
-  const welcomeHeadingHTML = Handlebars.compile(mainHeadingTemplate);
+  const template = Handlebars.compile(triviaQuestions);
+
+  const html = template({
+    question,
+    category,
+    answers,
+  });
+
+
+  triviaInfo.insertAdjacentHTML("afterbegin", html);
   
-  document.querySelector("main").insertAdjacentHTML(
-    "afterBegin",
-    welcomeHeadingHTML({
-      playerName,
-    })
-  );
 });
 
 

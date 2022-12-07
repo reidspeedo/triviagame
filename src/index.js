@@ -110,6 +110,7 @@ io.on('connection', socket => {
         // Send game details to all players
         io.in(room).emit('gameDetails', { game });
         
+        console.log(qdata)
     });
         
         // call getQuestion

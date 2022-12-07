@@ -11,12 +11,13 @@
       <section class="section game-info"></section>
 
       <section class="section trivia">
+        
         <h2 class="subheading">trivia</h2>
+        <div class="trivia__question"></div>
         <button class="btn trivia__startround-btn">Start Round</button>
         <button class="btn trivia__answer-btn" disabled>
           Reveal Answer
         </button>
-        <div class="trivia__question"></div>
         <div class="trivia__answers"></div>
         <form class="trivia__form">
           <input
@@ -87,23 +88,21 @@
     </script>
 
     <script id="trivia-question-template" type="text/x-handlebars-template">
-      <div class='trivia__question'>
+      <div class='trivia__question_box'>
         <p>
-          <span class='trivia__question-playername'>
-            {{playerName}} picked a question!
+          <span class='trivia__question-category'>
+            The category is ... {{category}}!
           </span>
           <span class='trivia__question-meta'>
-            {{createdAt}}
           </span>
         </p>
-        <p>
+        <h1>
           {{question}}
-        </p>
+        </h1>
+
         <ul>
           {{#each answers}}
-            <li>
-              {{this}}
-            </li>
+            <button>{{this}}</button>
           {{/each}}
         </ul>
       </div>
