@@ -97,22 +97,21 @@ chatForm.addEventListener("submit", (event) => {
 
 const triviaStartRoundButton = document.querySelector(".trivia__startround-btn");
 triviaStartRoundButton.addEventListener("click", () => {
-    triviaStartRoundButton.setAttribute("disabled", "disabled");
-
+    triviaStartRoundButton.setAttribute("hidden", "hidden");
+    console.log(room);
     socket.emit("startRound", room, (error) => {
         if (error) return alert(error);
 
     });
 });
 
-socket.on('gameDetails', ({game}) => {
+socket.on('gameDetails', ({room, game}) => {
   
   const triviaInfo = document.querySelector(".trivia__question");
 
   const triviaQuestions = document.querySelector("#trivia-question-template").innerHTML;
-  // const triviaAnswers = document.querySelector(".trivia__answers");
 
-  const { question, category, answers } = game.prompt;
+  const { question, category, answers } = game[room].prompt;
 
   
   const template = Handlebars.compile(triviaQuestions);
@@ -129,10 +128,22 @@ socket.on('gameDetails', ({game}) => {
 });
 
 
-//socket.on("updategame details")
-
 //socket.emit("anytime submissions are made - send back a message to update game object")
 
+const answerButton = document.querySelector(".trivia");
+answerButton.addEventListener("click", (event) => {
+  
+  
+  if (event.target.className === "btn trivia__answer-btn") {
+    const target = event.target.innerText;
+    socket.emit("submission", room, target, playerName, team, (error) => {
+      if (error) {
+        return alert(error)
+      }
+    })
+  };
+
+})
 //eventListener when max submissions = numberofplayers -> socket.emit("getnextquetion")
 
 //eventListener when currentRound = maxRounds emit gameover! (Smart contract pays out)

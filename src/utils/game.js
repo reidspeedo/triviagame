@@ -1,47 +1,78 @@
 const https = require("https");
-const { getAllPlayers } = require("./players.js");
 
-const game = {
-    prompt: {
-        category: "",
-        answers: "",
-        question: "",
-        createdAt: "",
-        correctAnswer: "",
-    },
-    roundStatus: {
-        submissions: {},
-        round: 0,
-        isRoundOver: false,
-        round_score: {
-            liberals: 0,
-            conservatives: 0,
-        }
-    },
-    gameStatus: {
-        round_score: {
-            liberals: 0,
-            conservatives: 0,
-        },
-        maxQuestions: 10,
-    },
-};
+const game = {}
+// const game_template = {
+//     prompt: {
+//         category: "",
+//         answers: "",
+//         question: "",
+//         createdAt: "",
+//         correctAnswer: "",
+//     },
+//     roundStatus: {
+//         submissions: [],
+//         round: 0,
+//         isRoundOver: false,
+//         round_score: {
+//             liberals: 0,
+//             conservatives: 0,
+//         }
+//     },
+//     gameStatus: {
+//         round_score: {
+//             liberals: 0,
+//             conservatives: 0,
+//         },
+//         maxQuestions: 10,
+//     },
+// };
 
-
-const updateGame = ((path, value) => {
-    var schema = game;  // a moving reference to internal objects within obj
-    var pList = path.split('.');
-    var len = pList.length;
+const updateGame = ((room, path, value) => {
+    let schema = {}
+    if (typeof game[room] !== 'undefined') {
+        schema = game[room];
+    } else {
+        const game_template = {
+            prompt: {
+                category: "",
+                answers: "",
+                question: "",
+                createdAt: "",
+                correctAnswer: "",
+            },
+            roundStatus: {
+                submissions: [],
+                round: 0,
+                isRoundOver: false,
+                round_score: {
+                    liberals: 0,
+                    conservatives: 0,
+                }
+            },
+            gameStatus: {
+                round_score: {
+                    liberals: 0,
+                    conservatives: 0,
+                },
+                maxQuestions: 10,
+            },
+        };
+        schema = game_template;
+        game[room] = game_template;
+    }
+    const pList = path.split('.'); //['prompt','question']
+    const len = pList.length; //2
 
     for(var i = 0; i < len-1; i++) {
-        var elem = pList[i];
+        var elem = pList[i]; // '1'
         if( !schema[elem] ) {
-            schema[elem] = {}
+            schema[elem] = {} // schema = {'1': {}}
         }
-        schema = schema[elem];
+        schema = schema[elem]; // schema = {}
     }
-    schema[pList[len-1]] = value;
-    game[pList[0]] = schema;
+    schema[pList[len-1]] = value; // schema = {'question': 'aewafe'}
+    game[room][pList[0]] = schema; // game = {'question': 'aewafe'}
+
 })
 
 const getQuestion = ((callback) => {

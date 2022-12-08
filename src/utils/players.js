@@ -55,12 +55,6 @@ const removePlayer = (id) => {
   });
 };
 
-const getTeam = (team) => {
-  if (team === "liberal") {
-    return "conservative"
-  }
-  else return "liberal"
-}
 
 // Export our helper methods
 module.exports = {
@@ -68,5 +62,4 @@ module.exports = {
   getPlayer,
   getAllPlayers,
   removePlayer,
-  getTeam,
 };

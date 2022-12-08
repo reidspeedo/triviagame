@@ -15,7 +15,7 @@
         <h2 class="subheading">trivia</h2>
         <div class="trivia__question"></div>
         <button class="btn trivia__startround-btn">Start Round</button>
-        <button class="btn trivia__answer-btn" disabled>
+        <button class="btn trivia__answer-btn" hidden>
           Reveal Answer
         </button>
         <div class="trivia__answers"></div>
@@ -99,10 +99,10 @@
         <h1>
           {{question}}
         </h1>
-
+        
         <ul>
           {{#each answers}}
-            <button>{{this}}</button>
+            <button class="btn trivia__answer-btn">{{this}}</button>
           {{/each}}
         </ul>
       </div>

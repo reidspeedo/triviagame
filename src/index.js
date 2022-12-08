@@ -12,6 +12,7 @@ const {
 } = require("./utils/game.js")
 
 const {
+    players,
     addPlayer,
     getAllPlayers,
     getPlayer,
@@ -101,23 +102,46 @@ io.on('connection', socket => {
         
         // Update game details
         const qdata = value[0];
-        updateGame('prompt.question',qdata.question); //update question
-        updateGame('prompt.category',qdata.category); //update category
-        updateGame('prompt.createdAt',new Date().getTime()); //update createdTime
-        updateGame('prompt.answers',qdata.incorrectAnswers.concat([qdata.correctAnswer])); //update answers
-        updateGame('prompt.correctAnswer',qdata.correctAnswer); //update correctAnswer
+        updateGame(room,'prompt.question',qdata.question); //update question
+        updateGame(room,'prompt.category',qdata.category); //update category
+        updateGame(room,'prompt.createdAt',new Date().getTime()); //update createdTime
+        updateGame(room,'prompt.answers',qdata.incorrectAnswers.concat([qdata.correctAnswer])); //update answers
+        updateGame(room,'prompt.correctAnswer',qdata.correctAnswer); //update correctAnswer
 
+        
         // Send game details to all players
-        io.in(room).emit('gameDetails', { game });
-        
-        console.log(qdata)
+        io.in(room).emit('gameDetails', { room, game });
+        console.log(game);
     });
+    })
+
+    socket.on("submission", (room, target, playerName, team, callback) => {
+        // Get current state of submissions object
+        const current_submissions = game[room].roundStatus.submissions;
         
-        // call getQuestion
-            // request Trivia API
-            // return gameinformation
-            // update game - prompt information information
-            // emit message with game details 
+        // Check to see if player already submitted
+        const existingSubmission = current_submissions.find((sub) => {
+            return sub.playerName === playerName && sub.team === team;
+          });
+        
+        // If submitted, throw error for user
+        if (existingSubmission) {
+            error = new Error("You've already submitted an answer")
+            return callback(error.message)
+        }
+
+        current_submissions.push({target, playerName, team});
+
+        updateGame(room, 'roundStatus.submissions', current_submissions);
+
+        // io.in(room).emit('submission)
+            // updategame details
+        // function ()
+            // check to see if number of submissions = number of players
+            // if so, calculate scores ->
+                // updategame details
+                // update scoreboard
+        
     })
 
     //socket.on("any submission") - Update game object - emit back "updategame details"
